@@ -3,7 +3,7 @@ package com.landoop.avro4sui
 import java.util.Scanner
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 
-import com.sksamuel.avro4s.{Template, TemplateGenerator, ModuleGenerator}
+import com.sksamuel.avro4s.{TemplateGenerator, ModuleGenerator}
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.{ServletHolder, ServletContextHandler}
 

@@ -56,33 +56,22 @@ object Build extends Build {
           </license>
         </licenses>
         <scm>
-          <url>git@github.com:sksamuel/avro4s.git</url>
-          <connection>scm:git@github.com:sksamuel/avro4s.git</connection>
+          <url>git@github.com:landoop/avro4s-ui.git</url>
+          <connection>scm:git@github.com:landoop/avro4s-ui.git</connection>
         </scm>
         <developers>
           <developer>
-            <id>sksamuel</id>
-            <name>sksamuel</name>
-            <url>http://github.com/sksamuel</url>
+            <id>antwnis</id>
+            <name>Antonios Chalkiopoulos</name>
+            <url>http://github.com/antwnis</url>
           </developer>
         </developers>
     }
   )
 
-  lazy val root = Project("avro4s", file("."))
+  lazy val root = Project("avro4s-ui", file("."))
     .settings(rootSettings: _*)
     .settings(publish := {})
-    .settings(publishArtifact := false)
-    .settings(name := "avro4s")
-    .aggregate(core, generator)
+    .settings(name := "avro4s-ui")
 
-  lazy val core = Project("avro4s-core", file("avro4s-core"))
-    .settings(rootSettings: _*)
-    .settings(publish := {})
-    .settings(name := "avro4s-core")
-
-  lazy val generator = Project("avro4s-generator", file("avro4s-generator"))
-    .settings(rootSettings: _*)
-    .settings(publish := {})
-    .settings(name := "avro4s-generator")
 }
