@@ -11,7 +11,7 @@ object Build extends Build {
   val ScalatestVersion = "3.0.0-M12"
   val Slf4jVersion = "1.7.12"
   val Log4jVersion = "1.2.17"
-  val Avro4sVersion = "1.0.0"
+  val Avro4sVersion = "1.1.1"
   val JettyVersion = "8.1.18.v20150929"
 
   val rootSettings = Seq(
@@ -28,6 +28,7 @@ object Build extends Build {
     sbtrelease.ReleasePlugin.autoImport.releaseCrossBuild := true,
     libraryDependencies ++= Seq(
       "com.sksamuel.avro4s" %% "avro4s-core"      % Avro4sVersion,
+      "com.sksamuel.avro4s" %% "avro4s-generator" % Avro4sVersion,
       "org.scala-lang"      % "scala-reflect"     % ScalaVersion,
       "org.slf4j"           % "slf4j-api"         % Slf4jVersion,
       "org.eclipse.jetty"   % "jetty-servlet"     % JettyVersion,
