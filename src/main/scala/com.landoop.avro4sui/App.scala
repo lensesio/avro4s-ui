@@ -3,7 +3,7 @@ package com.landoop.avro4sui
 import java.util.Scanner
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 
-import com.sksamuel.avro4s.{TemplateGenerator, ModuleGenerator}
+import com.sksamuel.avro4s.{Template, TemplateGenerator, ModuleGenerator}
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.{ServletHolder, ServletContextHandler}
 
@@ -20,6 +20,11 @@ trait Avro4sEndpoint {
     avro2scala.setAsyncSupported(true)
     handler.addServlet(avro2scala, "/avro2scala")
 
+    // Json => Avro
+    val json2avro = new ServletHolder(new Json2AvroServlet )
+    json2avro.setAsyncSupported(true)
+    handler.addServlet(json2avro, "/json2avro")
+
     val server = new Server(port)
     server.setHandler(handler)
     server.start()
@@ -33,27 +38,37 @@ class Avro2CaseClassServlet extends HttpServlet {
     if (req.getMethod.equalsIgnoreCase("POST")) {
       val postRequestObject = new Scanner(req.getInputStream, "UTF-8").useDelimiter("\\A").nextLine
       println("Detected POST with payload:" + postRequestObject)
-
       try {
-        val incomingSchema = new org.apache.avro.Schema.Parser().parse(postRequestObject)
-        val modules = ModuleGenerator(incomingSchema)
+        val modules = ModuleGenerator(postRequestObject)
         val templates = TemplateGenerator(modules)
-        templates.foreach(t => println(t))
-
-        println(incomingSchema)
-
-
+        templates.foreach(t => println(t.definition + " ---- " + t.file))
+        resp.setContentType("text/html; charset=utf-8")
+        resp.getWriter.write(templates.head.definition)
       } catch {
         case (e:Throwable) => println(e)
       }
-
     }
+  }
+}
 
-//    val schema = new JsonToAvroConverter("com.test.avro").convert("MyClass", json)
-//    println(schema.toString(true))
+class Json2AvroServlet extends HttpServlet {
+  override def service(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
+    if (req.getMethod.equalsIgnoreCase("POST")) {
+      val postRequestObject = new Scanner(req.getInputStream, "UTF-8").useDelimiter("\\A").nextLine
+      println("Detected POST with payload:" + postRequestObject)
+      try {
+//        val schema = JsonToAvroConverter("com.test.avro").convert("MyClass", "json")
+//        println(schema.toString(true))
 
-    resp.setContentType("application/json")
-    resp.getWriter.write("schema")
+        val modules = ModuleGenerator(postRequestObject)
+        val templates = TemplateGenerator(modules)
+        templates.foreach(t => println(t.definition + " ---- " + t.file))
+        resp.setContentType("text/html; charset=utf-8")
+        resp.getWriter.write(templates.head.definition)
+      } catch {
+        case (e:Throwable) => println(e)
+      }
+    }
   }
 }
 
