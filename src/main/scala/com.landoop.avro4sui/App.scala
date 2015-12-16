@@ -1,6 +1,7 @@
 package com.landoop.avro4sui
 
 import java.util.Scanner
+import com.sksamuel.avro4s.json.JsonToAvroConverter
 import javax.servlet.http.{HttpServletResponse, HttpServletRequest, HttpServlet}
 
 import com.sksamuel.avro4s.{TemplateGenerator, ModuleGenerator}
@@ -55,16 +56,13 @@ class Json2AvroServlet extends HttpServlet {
   override def service(req: HttpServletRequest, resp: HttpServletResponse): Unit = {
     if (req.getMethod.equalsIgnoreCase("POST")) {
       val postRequestObject = new Scanner(req.getInputStream, "UTF-8").useDelimiter("\\A").nextLine
-      println("Detected POST with payload:" + postRequestObject)
+      println("Detected [json=>avro] POST with payload:" + postRequestObject)
       try {
-//        val schema = JsonToAvroConverter("com.test.avro").convert("MyClass", "json")
-//        println(schema.toString(true))
-
-        val modules = ModuleGenerator(postRequestObject)
-        val templates = TemplateGenerator(modules)
-        templates.foreach(t => println(t.definition + " ---- " + t.file))
+        val schema = new JsonToAvroConverter("com.test.avro").convert("MyClass", postRequestObject)
+        val schemaString = schema.toString(true)
+        println(schemaString)
         resp.setContentType("text/html; charset=utf-8")
-        resp.getWriter.write(templates.head.definition)
+        resp.getWriter.write(schemaString)
       } catch {
         case (e:Throwable) => println(e)
       }
@@ -74,9 +72,24 @@ class Json2AvroServlet extends HttpServlet {
 
 object App extends Avro4sEndpoint with App {
 
-  case class Testing(name: String, description: String)
+  println("Test Avro => Scala with:")
+  println("""  curl -X POST --data '{ "type" : "record", "name" : "MyClass", "namespace" : "com.test.avro", "fields" : [ { "name" : "foo", "type" : { "type" : "array", "items" : "boolean" } } ] }' http://localhost:1082/avro2scala""")
+  println("Test Json => Avro with:")
 
-  println("Visit me at   http://localhost:1082/avro2scala/ ")
-  println("""Test me with  curl -X POST --data '{ "type" : "record", "name" : "MyClass", "namespace" : "com.test.avro", "fields" : [ { "name" : "foo", "type" : { "type" : "array", "items" : "boolean" } } ] }' http://localhost:1082/avro2scala""")
+  val exampleJson = """
+  {"menu": {
+    "id": "file",
+    "value": "File",
+    "popup": {
+    "menuitem": [
+  {"value": "New", "onclick": "CreateNewDoc()"},
+  {"value": "Open", "onclick": "OpenDoc()"},
+  {"value": "Close", "onclick": "CloseDoc()"}
+    ]
+  }
+  }}""".filter(_ >= ' ')
+
+  println(s"""  curl -X POST --data '$exampleJson' http://localhost:1082/json2avro""")
+
   server(1082)
 }
