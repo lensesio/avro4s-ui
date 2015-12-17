@@ -80,6 +80,6 @@ object App extends Avro4sEndpoint with App {
   println("Test Json => Avro with:")
   val exampleJson = """ {"menu": { "id": "file", "value": "File", "popup": { "menuitem": [ {"value": "New" }, {"value": "Open" }, {"value": "Close"} ] } }} """.filter(_ >= ' ')
   println(s"""  curl -X POST --data '$exampleJson' http://localhost:1082/avro4s""")
-
+  // https://www.landoop.com/avro4s/avro4s
   server(1082)
 }
